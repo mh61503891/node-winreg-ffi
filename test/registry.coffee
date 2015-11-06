@@ -5,9 +5,9 @@ describe 'Registry', ->
 
   it 'does not throw an error', ->
     expect(->
-      registry = Registry.open()
-      registry.info()
-      registry.keys()
-      registry.values()
+      registry = Registry.open(Registry.HKLM, '')
+      # registry.info()
+      # registry.keys()
+      # registry.values()
       registry.close()
     ).to.not.throw(Error)
