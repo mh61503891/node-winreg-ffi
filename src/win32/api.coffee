@@ -1,10 +1,9 @@
 ffi = require('ffi')
 ref = require('ref')
-Struct = require('ref-struct')
 WinError = require('./error')
 
 module.exports =
-class WinReg
+class API
 
   @CONSTANTS: require('./constants')
   @TYPES = require('./types')
@@ -12,8 +11,10 @@ class WinReg
   @DLL = ffi.Library 'advapi32.dll', {
     RegOpenKeyExW: [@TYPES.LONG, [@TYPES.ULONG, @TYPES.LPCWSTR, @TYPES.DWORD,
       @TYPES.REGSAM, @TYPES.PHKEY]]
-    # RegQueryInfoKeyW: [@LONG, [@HKEY, @LPWSTR, @PDWORD, @PDWORD, @PDWORD,
-    #   @PDWORD, @PDWORD, @PDWORD, @PDWORD, @PDWORD, @PDWORD, @PFILETIME]]
+    # RegQueryInfoKeyW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.LPWSTR,
+    #   @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
+    #   @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
+    #   @TYPES.PDWORD, @TYPES.PFILETIME]]
     # RegEnumKeyExW: [@LONG, [@HKEY, @DWORD, @LPWSTR, @PDWORD, @PDWORD, @LPWSTR,
     #   @PDWORD, @PFILETIME]]
     # RegEnumValueW: [@LONG, [@HKEY, @DWORD, @LPWSTR, @PDWORD, @PDWORD, @PDWORD,

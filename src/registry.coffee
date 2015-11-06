@@ -1,4 +1,4 @@
-API = require('./win32/winreg')
+API = require('./win32/api')
 
 module.exports =
 class Registry
