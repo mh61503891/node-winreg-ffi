@@ -1,2 +1,2 @@
 require('coffee-script/register');
-module.exports = require('./src/winreg-ffi');
+module.exports = require('./src/registry');
