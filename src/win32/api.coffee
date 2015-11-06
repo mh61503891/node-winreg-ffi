@@ -11,10 +11,10 @@ class API
   @DLL = ffi.Library 'advapi32.dll', {
     RegOpenKeyExW: [@TYPES.LONG, [@TYPES.ULONG, @TYPES.LPCWSTR, @TYPES.DWORD,
       @TYPES.REGSAM, @TYPES.PHKEY]]
-    # RegQueryInfoKeyW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.LPWSTR,
-    #   @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
-    #   @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
-    #   @TYPES.PDWORD, @TYPES.PFILETIME]]
+    RegQueryInfoKeyW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.LPWSTR,
+      @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
+      @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
+      @TYPES.PDWORD, @TYPES.PFILETIME]]
     # RegEnumKeyExW: [@LONG, [@HKEY, @DWORD, @LPWSTR, @PDWORD, @PDWORD, @LPWSTR,
     #   @PDWORD, @PFILETIME]]
     # RegEnumValueW: [@LONG, [@HKEY, @DWORD, @LPWSTR, @PDWORD, @PDWORD, @PDWORD,
@@ -40,3 +40,33 @@ class API
     code = @DLL.RegCloseKey(hKey)
     if code != @CONSTANTS.ERROR_SUCCESS
       throw new WinError(code)
+
+  # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724902(v=vs.85).aspx
+  @QueryInfoKey: (hkey) ->
+    hKey = hkey
+    lpClass = @TYPES.NULL
+    lpcClass = @TYPES.NULL
+    lpReserved = @TYPES.NULL
+    lpcSubKeys = ref.alloc(@TYPES.DWORD)
+    lpcMaxSubKeyLen = ref.alloc(@TYPES.DWORD)
+    lpcMaxClassLen = @TYPES.NULL
+    lpcValues = ref.alloc(@TYPES.DWORD)
+    lpcMaxValueNameLen = ref.alloc(@TYPES.DWORD)
+    lpcMaxValueLen = ref.alloc(@TYPES.DWORD)
+    lpcbSecurityDescriptor = ref.alloc(@TYPES.DWORD)
+    lpftLastWriteTime = ref.alloc(@TYPES.FILETIME)
+    code = @DLL.RegQueryInfoKeyW(hKey, lpClass, lpcClass, lpReserved,
+      lpcSubKeys, lpcMaxSubKeyLen, lpcMaxClassLen, lpcValues,
+      lpcMaxValueNameLen, lpcMaxValueLen, lpcbSecurityDescriptor,
+      lpftLastWriteTime)
+    if code != @CONSTANTS.ERROR_SUCCESS
+      throw new WinError(code)
+    return {
+      lpcSubKeys: lpcSubKeys.deref()
+      lpcMaxSubKeyLen: lpcMaxSubKeyLen.deref()
+      lpcValues: lpcValues.deref()
+      lpcMaxValueNameLen: lpcMaxValueNameLen.deref()
+      lpcMaxValueLen: lpcMaxValueLen.deref()
+      lpcbSecurityDescriptor: lpcbSecurityDescriptor.deref()
+      lpftLastWriteTime: lpftLastWriteTime.readInt64LE(0)
+    }

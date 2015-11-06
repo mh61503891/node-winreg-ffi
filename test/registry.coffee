@@ -6,7 +6,7 @@ describe 'Registry', ->
   it 'does not throw an error', ->
     expect(->
       registry = Registry.open(Registry.HKLM, '')
-      # registry.info()
+      console.log registry.info()
       # registry.keys()
       # registry.values()
       registry.close()
