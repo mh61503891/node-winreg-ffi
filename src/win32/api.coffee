@@ -44,12 +44,12 @@ class API
   # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724902(v=vs.85).aspx
   @QueryInfoKey: (hkey) ->
     hKey = hkey
-    lpClass = @TYPES.NULL
-    lpcClass = @TYPES.NULL
-    lpReserved = @TYPES.NULL
+    lpClass = @CONSTANTS.NULL
+    lpcClass = @CONSTANTS.NULL
+    lpReserved = @CONSTANTS.NULL
     lpcSubKeys = ref.alloc(@TYPES.DWORD)
     lpcMaxSubKeyLen = ref.alloc(@TYPES.DWORD)
-    lpcMaxClassLen = @TYPES.NULL
+    lpcMaxClassLen = @CONSTANTS.NULL
     lpcValues = ref.alloc(@TYPES.DWORD)
     lpcMaxValueNameLen = ref.alloc(@TYPES.DWORD)
     lpcMaxValueLen = ref.alloc(@TYPES.DWORD)

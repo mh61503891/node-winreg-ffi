@@ -1,6 +1,10 @@
+ref = require('ref')
+
 module.exports =
 class Constants
 
+  # windef.h
+  @NULL: ref.NULL
   # winnt.h
   @STANDARD_RIGHTS_READ: 0x00020000
   @STANDARD_RIGHTS_WRITE: 0x00020000

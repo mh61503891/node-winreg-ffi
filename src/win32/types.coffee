@@ -5,7 +5,6 @@ module.exports =
 class Types
 
   # windef.h
-  @NULL: ref.NULL
   @VOID: ref.types.void
   @PVOID: ref.refType(@VOID)
   @LONG: ref.types.long
