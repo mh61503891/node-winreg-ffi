@@ -11,6 +11,7 @@ class API
   @DLL = ffi.Library 'advapi32.dll', {
     RegOpenKeyExW: [@TYPES.LONG, [@TYPES.ULONG, @TYPES.LPCWSTR, @TYPES.DWORD,
       @TYPES.REGSAM, @TYPES.PHKEY]]
+    RegCloseKey: [@TYPES.LONG, [@TYPES.HKEY]]
     RegQueryInfoKeyW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.LPWSTR,
       @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
       @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
@@ -19,7 +20,6 @@ class API
     #   @PDWORD, @PFILETIME]]
     # RegEnumValueW: [@LONG, [@HKEY, @DWORD, @LPWSTR, @PDWORD, @PDWORD, @PDWORD,
     #   @LPBYTE, @PDWORD]]
-    RegCloseKey: [@TYPES.LONG, [@TYPES.HKEY]]
   }
 
   # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724897(v=vs.85).aspx
