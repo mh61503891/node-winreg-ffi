@@ -4,21 +4,26 @@ Struct = require('ref-struct')
 module.exports =
 class Types
 
-  # windef.h
+  # fundamental types
   @VOID: ref.types.void
-  @PVOID: ref.refType(@VOID)
+  @CHAR: ref.types.char
+  @SHORT: ref.types.short
   @LONG: ref.types.long
+  @UCHAR: ref.types.uchar
+  @USHORT: ref.types.ushort
   @ULONG: ref.types.ulong
-  @DWORD: ref.types.ulong
+  @PVOID: ref.refType(@VOID)
+
+  # windef.h
+  @DWORD: @ULONG
   @PDWORD: ref.refType(@DWORD)
-  @HKEY: @PVOID
-  @PHKEY: ref.refType(@HKEY)
-  @BYTE: ref.types.uchar
+  @HKEY: @PVOID # HACK reinterpret_cast
+  @PHKEY: ref.refType(@ULONG) # HACK reinterpret_cast
+  @BYTE: @UCHAR
   @LPBYTE: ref.refType(@BYTE)
 
   # winnt.h
-  # @WCHAR: require('./ref-wchar')
-  @WCHAR: @BYTE
+  @WCHAR: @USHORT
   @LPCWSTR: ref.refType(@WCHAR)
   @LPWSTR: ref.refType(@WCHAR)
   @ACCESS_MASK: @DWORD
