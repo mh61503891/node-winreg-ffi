@@ -21,8 +21,16 @@ class Registry
   info: ->
     API.QueryInfoKey(@api)
 
-  # TODO
   keys: ->
+    result = []
+    index = 0
+    info = API.QueryInfoKey(@api)
+    loop
+      entry = API.EnumKey(@api, index, info)
+      break if entry.code == API.CONSTANTS.ERROR_NO_MORE_ITEMS
+      result.push(key: entry.key, wtime: entry.wtime)
+      index++
+    return result
 
   # TODO
-  values: ->
+  # values: ->

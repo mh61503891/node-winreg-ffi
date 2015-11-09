@@ -1,6 +1,7 @@
 ffi = require('ffi')
 ref = require('ref')
 WinError = require('./error')
+jconv = require('jconv')
 
 module.exports =
 class API
@@ -16,14 +17,14 @@ class API
       @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
       @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD,
       @TYPES.PDWORD, @TYPES.PFILETIME]]
+    RegQueryValueExW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.LPCWSTR,
+      @TYPES.LPDWORD, @TYPES.LPDWORD, @TYPES.LPBYTE, @TYPES.LPDWORD]]
     RegEnumKeyExW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.DWORD, @TYPES.LPWSTR,
       @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.LPWSTR, @TYPES.PDWORD,
       @TYPES.PFILETIME]]
     RegEnumValueW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.DWORD, @TYPES.LPWSTR,
       @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.PDWORD, @TYPES.LPBYTE,
       @TYPES.PDWORD]]
-    RegQueryValueExW: [@TYPES.LONG, [@TYPES.HKEY, @TYPES.LPCWSTR,
-      @TYPES.LPDWORD, @TYPES.LPDWORD, @TYPES.LPBYTE, @TYPES.LPDWORD]]
   }
 
   # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724897(v=vs.85).aspx
@@ -74,3 +75,40 @@ class API
       lpcbSecurityDescriptor: lpcbSecurityDescriptor.deref()
       lpftLastWriteTime: lpftLastWriteTime.readInt64LE(0)
     }
+
+  # TODO
+  # https://msdn.microsoft.com/ja-jp/library/windows/desktop/ms724911(v=vs.85).aspx
+  # @QueryValue: ->
+
+  # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724862(v=vs.85).aspx
+  @EnumKey: (hkey, index, info) ->
+    hKey = hkey
+    dwIndex = index
+    len = info.lpcMaxSubKeyLen * @TYPES.WCHAR.size
+    lpName = new Buffer(len, 'utf16le')
+    lpcName = ref.alloc(@TYPES.DWORD)
+    lpcName.writeUInt32LE(len)
+    lpReserved = @CONSTANTS.NULL
+    lpClass = @CONSTANTS.NULL
+    lpcClass = @CONSTANTS.NULL
+    lpftLastWriteTime = ref.alloc(@TYPES.FILETIME)
+    code = @DLL.RegEnumKeyExW(hKey, dwIndex, lpName, lpcName, lpReserved,
+      lpClass, lpcClass, lpftLastWriteTime)
+    switch code
+      when @CONSTANTS.ERROR_SUCCESS
+        return {
+          code: code
+          key: jconv.convert(lpName.reinterpretUntilZeros(@TYPES.WCHAR.size),
+            'utf16le', 'utf8').toString()
+          wtime: lpftLastWriteTime.readInt64LE(0)
+        }
+      when @CONSTANTS.ERROR_NO_MORE_ITEMS
+        return {
+          code: code
+        }
+      else
+        throw new WinError(code)
+
+  # TODO
+  # https://msdn.microsoft.com/ja-jp/library/windows/desktop/ms724911(v=vs.85).aspx
+  # @EnumValue ->
