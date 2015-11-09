@@ -2,6 +2,7 @@ ffi = require('ffi')
 ref = require('ref')
 WinError = require('./error')
 jconv = require('jconv')
+debug = require('debug')('winreg-ffi:api')
 
 module.exports =
 class API
@@ -109,6 +110,83 @@ class API
       else
         throw new WinError(code)
 
-  # TODO
   # https://msdn.microsoft.com/ja-jp/library/windows/desktop/ms724911(v=vs.85).aspx
-  # @EnumValue ->
+  @EnumValue: (hkey, index, info) ->
+    # handle key
+    hKey = hkey
+    # index
+    dwIndex = index
+    # name
+    vnlen = info.lpcMaxValueNameLen * @TYPES.WCHAR.size
+    lpValueName = new Buffer(vnlen, 'utf16le')
+    lpcValueName = ref.alloc(@TYPES.DWORD)
+    lpcValueName.writeUInt32LE(vnlen)
+    # reserved
+    lpReserved = @CONSTANTS.NULL
+    # type
+    lpType = ref.alloc(@TYPES.DWORD)
+    # value
+    vlen = info.lpcMaxValueLen * @TYPES.WCHAR.size
+    lpData = new Buffer(vlen, 'utf16le')
+    lpcbData = ref.alloc(@TYPES.DWORD)
+    lpcbData.writeUInt32LE(vlen)
+
+    debug '%j', {
+      dwIndex: dwIndex
+      vnlen: vnlen
+      lpcValueName: lpcValueName.deref()
+    }
+
+    code = @DLL.RegEnumValueW(hKey, dwIndex, lpValueName, lpcValueName,
+      lpReserved, lpType, lpData, lpcbData)
+
+    switch code
+      when @CONSTANTS.ERROR_SUCCESS
+        return @dispatch(code, lpType.deref(), lpValueName, lpData)
+      when @CONSTANTS.ERROR_NO_MORE_ITEMS
+        return {code: code}
+      else
+        throw new WinError(code)
+
+  @dispatch: (ccode, ctype, cname, cdata) ->
+    jcode = ccode
+    jtype = ctype
+    jname = jconv.convert(cname.reinterpretUntilZeros(@TYPES.WCHAR.size),
+      'utf16le', 'utf8').toString()
+    jdata = switch ctype
+      when @CONSTANTS.REG_NONE # 0
+        cdata
+      when @CONSTANTS.REG_SZ # 1
+        jconv.convert(cdata.reinterpretUntilZeros(@TYPES.WCHAR.size),
+          'utf16le', 'utf8').toString()
+      when @CONSTANTS.REG_EXPAND_SZ # 2
+        jconv.convert(cdata.reinterpretUntilZeros(@TYPES.WCHAR.size),
+          'utf16le', 'utf8').toString()
+      when @CONSTANTS.REG_BINARY # 3
+        cdata
+      when @CONSTANTS.REG_DWORD_LITTLE_ENDIAN, @CONSTANTS.REG_DWORD # 4
+        cdata.readUInt32LE()
+      when @CONSTANTS.REG_DWORD_BIG_ENDIAN # 5
+        cdata.readUInt32BE()
+      when @CONSTANTS.REG_MULTI_SZ #7
+        cdata # TODO
+      when @CONSTANTS.REG_QWORD_LITTLE_ENDIAN, @CONSTANTS.REG_QWORD # 11
+        cdata.readInt64LE(0)
+      when @CONSTANTS.REG_LINK # 6
+        throw new Error("Type #{type} is not supported.")
+      when @CONSTANTS.REG_RESOURCE_LIST # 8
+        throw new Error("Type #{type} is not supported.")
+      when @CONSTANTS.REG_FULL_RESOURCE_DESCRIPTOR # 9
+        throw new Error("Type #{type} is not supported.")
+      when @CONSTANTS.REG_RESOURCE_REQUIREMENTS_LIST # 10
+        throw new Error("Type #{type} is not supported.")
+      else
+        throw new Error("Type #{type} is invalid.")
+    entry = {
+      code: jcode
+      name: jname
+      type: jtype
+      data: jdata
+    }
+    debug 'dispatch: %j', entry
+    return entry

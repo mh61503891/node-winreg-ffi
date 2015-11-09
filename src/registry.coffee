@@ -32,5 +32,13 @@ class Registry
       index++
     return result
 
-  # TODO
-  # values: ->
+  values: ->
+    result = []
+    index = 0
+    info = API.QueryInfoKey(@api)
+    loop
+      entry = API.EnumValue(@api, index, info)
+      break if entry.code == API.CONSTANTS.ERROR_NO_MORE_ITEMS
+      result.push(type: entry.type, name: entry.name, value: entry.data)
+      index++
+    return result
