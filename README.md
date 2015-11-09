@@ -12,13 +12,13 @@ _ = require('underscore')
 
 hive = Registry.HKLM
 
-# enum keys
+# keys
 parent = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall'
 registry = Registry.open(hive, parent)
 console.log keys = registry.keys()
 registry.close()
 
-# enum values
+# values
 children = _.map keys, (key) -> parent + '\\' + key.key
 registry = Registry.open(Registry.HKLM, children[5])
 console.log registry.values()
@@ -36,7 +36,7 @@ npm test
 or
 
 ```
-set DEBUG=winreg:*
+set DEBUG=winreg-ffi:*
 node_modules\.bin\mocha --compilers coffee:coffee-script/register test
 ```
 
