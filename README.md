@@ -2,7 +2,7 @@
 
 # winreg-ffi
 
-A Node.js module for binding Winreg.h using foreign function interface.
+A Node.js module for binding Winreg.h using [node-ffi](https://github.com/node-ffi/node-ffi).
 
 ## Example
 
