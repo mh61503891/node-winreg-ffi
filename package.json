@@ -15,6 +15,9 @@
   "os": [
     "win32"
   ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
   "keywords": [
     "windows",
     "win32",
