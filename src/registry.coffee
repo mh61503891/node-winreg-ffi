@@ -3,17 +3,11 @@ API = require('./win32/api')
 module.exports =
 class Registry
 
-  @HKCR: API.CONSTANTS.HKCR
-  @HKCU: API.CONSTANTS.HKCU
-  @HKLM: API.CONSTANTS.HKLM
-  @HKU: API.CONSTANTS.HKU
-  @HKCC: API.CONSTANTS.HKCC
-
   constructor: (api) ->
     @api = api
 
   @open: (key, subkey) ->
-    new Registry(API.OpenKey(key, subkey))
+    new Registry(API.OpenKey(API.CONSTANTS[key], subkey))
 
   close: ->
     API.CloseKey(@api)

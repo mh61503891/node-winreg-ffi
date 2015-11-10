@@ -10,7 +10,7 @@ A Node.js module for binding Winreg.h using [node-ffi](https://github.com/node-f
 Registry = require('winreg-ffi')
 _ = require('underscore')
 
-hive = Registry.HKLM
+hive = 'HKLM'
 
 # keys
 parent = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall'
