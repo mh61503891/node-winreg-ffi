@@ -6,7 +6,7 @@ A Node.js module for binding Winreg.h using [node-ffi](https://github.com/node-f
 
 ## Example
 
-```coffee
+```example.coffee
 Registry = require('winreg-ffi')
 _ = require('underscore')
 
