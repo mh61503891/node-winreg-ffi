@@ -1,6 +1,6 @@
 {
   "name": "winreg-ffi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Node.js module for binding Winreg.h using node-ffi.",
   "main": "src/index.js",
   "bin": "bin/cli",
