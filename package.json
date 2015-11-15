@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "A Node.js module for binding Winreg.h using node-ffi.",
   "main": "src/index.js",
+  "bin": "bin/cli",
   "scripts": {
     "lint": "gulp lint",
     "test": "gulp test",
@@ -37,6 +38,7 @@
   "dependencies": {
     "ffi": "^2.0.0",
     "jconv": "^0.1.5",
+    "meow": "^3.6.0",
     "ref": "^1.2.0",
     "ref-struct": "^1.0.2",
     "underscore": "^1.8.3"

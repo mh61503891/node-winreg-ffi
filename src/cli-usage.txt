@@ -1,0 +1,7 @@
+Usage:
+  winreg-ffi --help
+  winreg-ffi query KEY [--reg32 | --reg64]
+
+Examples:
+winreg-ffi query HKLM\SOFTWARE
+winreg-ffi query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Office15.PROPLUS
