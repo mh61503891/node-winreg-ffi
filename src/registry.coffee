@@ -10,8 +10,10 @@ class Registry
   constructor: (api) ->
     @api = api
 
-  @open: (key, subkey) ->
-    new Registry(API.OpenKey(API.CONSTANTS[key], subkey))
+  @open: (key, subkey,
+    desired = CONSTANTS.KEY_READ,
+    opt = CONSTANTS.REG_OPTION_RESERVED) ->
+      new Registry(API.OpenKey(CONSTANTS[key], subkey, desired, opt))
 
   close: ->
     API.CloseKey(@api)

@@ -29,7 +29,7 @@ class API
   }
 
   # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724897(v=vs.85).aspx
-  @OpenKey: (hkey, subkey) ->
+  @OpenKey: (hkey, subkey, desired, opt) ->
     hKey = hkey
     lpSubKey = new Buffer(subkey + '\0', 'utf16le')
     ulOptions = CONSTANTS.REG_OPTION_RESERVED
