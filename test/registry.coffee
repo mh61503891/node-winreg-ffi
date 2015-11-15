@@ -35,7 +35,7 @@ describe 'Registry', ->
         registry = Registry.open('HKLM', parent)
         keys = registry.keys()
         registry.close()
-        return keys.map (key) -> parent + '\\' + key.key
+        return keys.map (key) -> parent + '\\' + key.name
       expect(->
         for key in getAppKeys()
           registry = Registry.open('HKLM', key)

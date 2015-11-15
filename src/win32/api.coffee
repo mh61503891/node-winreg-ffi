@@ -102,7 +102,7 @@ class API
       when CONSTANTS.ERROR_SUCCESS
         return {
           code: code
-          key: toString(lpName, lpcName.deref() * @TYPES.TCHAR.size)
+          name: toString(lpName, lpcName.deref() * @TYPES.TCHAR.size)
           wtime: lpftLastWriteTime.readInt64LE(0)
         }
       when CONSTANTS.ERROR_NO_MORE_ITEMS

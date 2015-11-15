@@ -28,7 +28,7 @@ class Registry
     loop
       entry = API.EnumKey(@api, index, info)
       break if entry.code == CONSTANTS.ERROR_NO_MORE_ITEMS
-      result.push(key: entry.key, wtime: entry.wtime)
+      result.push(name: entry.name, wtime: entry.wtime)
       index++
     return result
 
