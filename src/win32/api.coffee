@@ -3,11 +3,11 @@ ref = require('ref')
 WinError = require('./error')
 jconv = require('jconv')
 debug = require('debug')('winreg-ffi:api')
+CONSTANTS = require('./constants')
 
 module.exports =
 class API
 
-  @CONSTANTS: require('./constants')
   @TYPES = require('./types')
 
   @DLL = ffi.Library 'advapi32.dll', {
@@ -32,11 +32,11 @@ class API
   @OpenKey: (hkey, subkey) ->
     hKey = hkey
     lpSubKey = new Buffer(subkey + '\0', 'utf16le')
-    ulOptions = @CONSTANTS.REG_OPTION_RESERVED
-    samDesired = @CONSTANTS.KEY_READ
+    ulOptions = CONSTANTS.REG_OPTION_RESERVED
+    samDesired = desired
     phkResult = ref.alloc(@TYPES.PHKEY)
     code = @DLL.RegOpenKeyExW(hKey, lpSubKey, ulOptions, samDesired, phkResult)
-    if code != @CONSTANTS.ERROR_SUCCESS
+    if code != CONSTANTS.ERROR_SUCCESS
       throw new WinError(code)
     return phkResult.deref()
 
@@ -44,18 +44,18 @@ class API
   @CloseKey: (hkey) ->
     hKey = hkey
     code = @DLL.RegCloseKey(hKey)
-    if code != @CONSTANTS.ERROR_SUCCESS
+    if code != CONSTANTS.ERROR_SUCCESS
       throw new WinError(code)
 
   # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724902(v=vs.85).aspx
   @QueryInfoKey: (hkey) ->
     hKey = hkey
-    lpClass = @CONSTANTS.NULL
-    lpcClass = @CONSTANTS.NULL
-    lpReserved = @CONSTANTS.NULL
+    lpClass = CONSTANTS.NULL
+    lpcClass = CONSTANTS.NULL
+    lpReserved = CONSTANTS.NULL
     lpcSubKeys = ref.alloc(@TYPES.DWORD)
     lpcMaxSubKeyLen = ref.alloc(@TYPES.DWORD)
-    lpcMaxClassLen = @CONSTANTS.NULL
+    lpcMaxClassLen = CONSTANTS.NULL
     lpcValues = ref.alloc(@TYPES.DWORD)
     lpcMaxValueNameLen = ref.alloc(@TYPES.DWORD)
     lpcMaxValueLen = ref.alloc(@TYPES.DWORD)
@@ -65,7 +65,7 @@ class API
       lpcSubKeys, lpcMaxSubKeyLen, lpcMaxClassLen, lpcValues,
       lpcMaxValueNameLen, lpcMaxValueLen, lpcbSecurityDescriptor,
       lpftLastWriteTime)
-    if code != @CONSTANTS.ERROR_SUCCESS
+    if code != CONSTANTS.ERROR_SUCCESS
       throw new WinError(code)
     return {
       lpcSubKeys: lpcSubKeys.deref()
@@ -89,21 +89,21 @@ class API
     lpName = new Buffer(len, 'utf16le')
     lpcName = ref.alloc(@TYPES.DWORD)
     lpcName.writeUInt32LE(len)
-    lpReserved = @CONSTANTS.NULL
-    lpClass = @CONSTANTS.NULL
-    lpcClass = @CONSTANTS.NULL
+    lpReserved = CONSTANTS.NULL
+    lpClass = CONSTANTS.NULL
+    lpcClass = CONSTANTS.NULL
     lpftLastWriteTime = ref.alloc(@TYPES.FILETIME)
     code = @DLL.RegEnumKeyExW(hKey, dwIndex, lpName, lpcName, lpReserved,
       lpClass, lpcClass, lpftLastWriteTime)
     switch code
-      when @CONSTANTS.ERROR_SUCCESS
+      when CONSTANTS.ERROR_SUCCESS
         return {
           code: code
           key: jconv.convert(lpName.reinterpretUntilZeros(@TYPES.WCHAR.size),
             'utf16le', 'utf8').toString()
           wtime: lpftLastWriteTime.readInt64LE(0)
         }
-      when @CONSTANTS.ERROR_NO_MORE_ITEMS
+      when CONSTANTS.ERROR_NO_MORE_ITEMS
         return {
           code: code
         }
@@ -122,7 +122,7 @@ class API
     lpcValueName = ref.alloc(@TYPES.DWORD)
     lpcValueName.writeUInt32LE(vnlen)
     # reserved
-    lpReserved = @CONSTANTS.NULL
+    lpReserved = CONSTANTS.NULL
     # type
     lpType = ref.alloc(@TYPES.DWORD)
     # value
@@ -141,9 +141,9 @@ class API
       lpReserved, lpType, lpData, lpcbData)
 
     switch code
-      when @CONSTANTS.ERROR_SUCCESS
+      when CONSTANTS.ERROR_SUCCESS
         return @dispatch(code, lpType.deref(), lpValueName, lpData)
-      when @CONSTANTS.ERROR_NO_MORE_ITEMS
+      when CONSTANTS.ERROR_NO_MORE_ITEMS
         return {code: code}
       else
         throw new WinError(code)
@@ -154,31 +154,31 @@ class API
     jname = jconv.convert(cname.reinterpretUntilZeros(@TYPES.WCHAR.size),
       'utf16le', 'utf8').toString()
     jdata = switch ctype
-      when @CONSTANTS.REG_NONE # 0
+      when CONSTANTS.REG_NONE # 0
         cdata
-      when @CONSTANTS.REG_SZ # 1
+      when CONSTANTS.REG_SZ # 1
         jconv.convert(cdata.reinterpretUntilZeros(@TYPES.WCHAR.size),
           'utf16le', 'utf8').toString()
-      when @CONSTANTS.REG_EXPAND_SZ # 2
+      when CONSTANTS.REG_EXPAND_SZ # 2
         jconv.convert(cdata.reinterpretUntilZeros(@TYPES.WCHAR.size),
           'utf16le', 'utf8').toString()
-      when @CONSTANTS.REG_BINARY # 3
+      when CONSTANTS.REG_BINARY # 3
         cdata
-      when @CONSTANTS.REG_DWORD_LITTLE_ENDIAN, @CONSTANTS.REG_DWORD # 4
+      when CONSTANTS.REG_DWORD_LITTLE_ENDIAN, CONSTANTS.REG_DWORD # 4
         cdata.readUInt32LE()
-      when @CONSTANTS.REG_DWORD_BIG_ENDIAN # 5
+      when CONSTANTS.REG_DWORD_BIG_ENDIAN # 5
         cdata.readUInt32BE()
-      when @CONSTANTS.REG_MULTI_SZ #7
+      when CONSTANTS.REG_MULTI_SZ #7
         cdata # TODO
-      when @CONSTANTS.REG_QWORD_LITTLE_ENDIAN, @CONSTANTS.REG_QWORD # 11
+      when CONSTANTS.REG_QWORD_LITTLE_ENDIAN, CONSTANTS.REG_QWORD # 11
         cdata.readInt64LE(0)
-      when @CONSTANTS.REG_LINK # 6
+      when CONSTANTS.REG_LINK # 6
         throw new Error("Type #{type} is not supported.")
-      when @CONSTANTS.REG_RESOURCE_LIST # 8
+      when CONSTANTS.REG_RESOURCE_LIST # 8
         throw new Error("Type #{type} is not supported.")
-      when @CONSTANTS.REG_FULL_RESOURCE_DESCRIPTOR # 9
+      when CONSTANTS.REG_FULL_RESOURCE_DESCRIPTOR # 9
         throw new Error("Type #{type} is not supported.")
-      when @CONSTANTS.REG_RESOURCE_REQUIREMENTS_LIST # 10
+      when CONSTANTS.REG_RESOURCE_REQUIREMENTS_LIST # 10
         throw new Error("Type #{type} is not supported.")
       else
         throw new Error("Type #{type} is invalid.")

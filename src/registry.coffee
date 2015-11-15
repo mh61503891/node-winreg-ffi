@@ -1,7 +1,11 @@
 API = require('./win32/api')
+CONSTANTS = require('./win32/constants')
 
 module.exports =
 class Registry
+
+  @API: API
+  @CONSTANTS: CONSTANTS
 
   constructor: (api) ->
     @api = api
@@ -21,18 +25,21 @@ class Registry
     info = API.QueryInfoKey(@api)
     loop
       entry = API.EnumKey(@api, index, info)
-      break if entry.code == API.CONSTANTS.ERROR_NO_MORE_ITEMS
+      break if entry.code == CONSTANTS.ERROR_NO_MORE_ITEMS
       result.push(key: entry.key, wtime: entry.wtime)
       index++
     return result
 
   values: ->
-    result = []
+    result = {}
     index = 0
     info = API.QueryInfoKey(@api)
     loop
       entry = API.EnumValue(@api, index, info)
-      break if entry.code == API.CONSTANTS.ERROR_NO_MORE_ITEMS
-      result.push(type: entry.type, name: entry.name, value: entry.data)
+      break if entry.code == CONSTANTS.ERROR_NO_MORE_ITEMS
+      result[entry.name] = {
+        type: entry.type
+        value: entry.data
+      }
       index++
     return result
