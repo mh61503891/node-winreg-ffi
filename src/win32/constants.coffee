@@ -20,6 +20,8 @@ class Constants
   @KEY_WRITE: @STANDARD_RIGHTS_WRITE | @KEY_SET_VALUE | @KEY_CREATE_SUB_KEY
   @KEY_EXECUTE: @KEY_READ
   @KEY_ALL_ACCESS: @KEY_READ | @KEY_WRITE | @KEY_CREATE_LINK
+  @KEY_WOW64_32KEY = 0x0200 # Windows 2000: This flag is not supported.
+  @KEY_WOW64_64KEY = 0x0100 #Windows 2000: This flag is not supported.
 
   # winerror.h
   @ERROR_SUCCESS = 0
