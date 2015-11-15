@@ -24,7 +24,7 @@ registry.close()
 
 ## CLI
 
-```bash
+```
 >winreg-ffi --help
 
 A Node.js module for binding Winreg.h using node-ffi.
