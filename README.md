@@ -8,7 +8,6 @@ A Node.js module for binding Winreg.h using [node-ffi](https://github.com/node-f
 
 ```example.coffee
 Registry = require('winreg-ffi')
-_ = require('underscore')
 
 # keys
 parent = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall'
@@ -17,10 +16,26 @@ console.log keys = registry.keys()
 registry.close()
 
 # values
-children = _.map keys, (key) -> parent + '\\' + key.key
+children = keys.map (key) -> parent + '\\' + key.name
 registry = Registry.open('HKLM', children[5])
 console.log registry.values()
 registry.close()
+```
+
+## CLI
+
+```bash
+>winreg-ffi --help
+
+A Node.js module for binding Winreg.h using node-ffi.
+
+Usage:
+  winreg-ffi --help
+  winreg-ffi query KEY [--reg32 | --reg64]
+
+Examples:
+  winreg-ffi query HKLM\SOFTWARE
+  winreg-ffi query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Office15.PROPLUS
 ```
 
 ## Development
@@ -51,6 +66,7 @@ node_modules\.bin\mocha --compilers coffee:coffee-script/register test
 - [ ] RegSetValueExW
 - [ ] RegDeleteValueW
 - [ ] RegFlushKey
+- [x] CLI
 
 ## Author
 
