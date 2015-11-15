@@ -1,7 +1,7 @@
 {
   "name": "winreg-ffi",
   "version": "0.0.1",
-  "description": "A Node.js module for binding Winreg.h using foreign function interface.",
+  "description": "A Node.js module for binding Winreg.h using node-ffi.",
   "main": "src/index.js",
   "scripts": {
     "lint": "gulp lint",
