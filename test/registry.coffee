@@ -21,7 +21,6 @@ describe 'Registry', ->
 
   describe 'values()', ->
     it 'returns a object', ->
-      console.log 'items', Registry.ERROR_NO_MORE_ITEMS
       key = 'Software\\Microsoft\\Windows\\CurrentVersion'
       registry = Registry.open('HKLM', key)
       values = registry.values()
