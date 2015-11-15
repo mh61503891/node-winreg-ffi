@@ -29,6 +29,7 @@ class Types
   @LPWSTR: ref.refType(@WCHAR)
   @ACCESS_MASK: @DWORD
   @REGSAM: @ACCESS_MASK
+  @TCHAR: @WCHAR
 
   # winbase.h
   @FILETIME: Struct {

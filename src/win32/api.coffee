@@ -5,6 +5,9 @@ jconv = require('jconv')
 debug = require('debug')('winreg-ffi:api')
 CONSTANTS = require('./constants')
 
+toString = (buffer, size) ->
+  jconv.convert(buffer.slice(0, size), 'utf16le', 'utf8').toString()
+
 module.exports =
 class API
 
@@ -99,8 +102,7 @@ class API
       when CONSTANTS.ERROR_SUCCESS
         return {
           code: code
-          key: jconv.convert(lpName.reinterpretUntilZeros(@TYPES.WCHAR.size),
-            'utf16le', 'utf8').toString()
+          key: toString(lpName, lpcName.deref() * @TYPES.TCHAR.size)
           wtime: lpftLastWriteTime.readInt64LE(0)
         }
       when CONSTANTS.ERROR_NO_MORE_ITEMS
@@ -142,36 +144,34 @@ class API
 
     switch code
       when CONSTANTS.ERROR_SUCCESS
-        return @dispatch(code, lpType.deref(), lpValueName, lpData)
+        return @dispatch(code, lpType, lpValueName, lpcValueName,
+          lpData, lpcbData)
       when CONSTANTS.ERROR_NO_MORE_ITEMS
         return {code: code}
       else
         throw new WinError(code)
 
-  @dispatch: (ccode, ctype, cname, cdata) ->
-    jcode = ccode
-    jtype = ctype
-    jname = jconv.convert(cname.reinterpretUntilZeros(@TYPES.WCHAR.size),
-      'utf16le', 'utf8').toString()
-    jdata = switch ctype
+  @dispatch: (code, type, name, cname, data, cdata) ->
+    jcode = code
+    jtype = type.deref()
+    jname = toString(name, cname.deref() * @TYPES.TCHAR.size)
+    jdata = switch jtype
       when CONSTANTS.REG_NONE # 0
-        cdata
+        data
       when CONSTANTS.REG_SZ # 1
-        jconv.convert(cdata.reinterpretUntilZeros(@TYPES.WCHAR.size),
-          'utf16le', 'utf8').toString()
+        toString(data, cdata.deref() - @TYPES.TCHAR.size)
       when CONSTANTS.REG_EXPAND_SZ # 2
-        jconv.convert(cdata.reinterpretUntilZeros(@TYPES.WCHAR.size),
-          'utf16le', 'utf8').toString()
+        toString(data, cdata.deref() - @TYPES.TCHAR.size)
       when CONSTANTS.REG_BINARY # 3
-        cdata
+        data
       when CONSTANTS.REG_DWORD_LITTLE_ENDIAN, CONSTANTS.REG_DWORD # 4
-        cdata.readUInt32LE()
+        data.readUInt32LE()
       when CONSTANTS.REG_DWORD_BIG_ENDIAN # 5
-        cdata.readUInt32BE()
+        data.readUInt32BE()
       when CONSTANTS.REG_MULTI_SZ #7
-        cdata # TODO
+        data # TODO
       when CONSTANTS.REG_QWORD_LITTLE_ENDIAN, CONSTANTS.REG_QWORD # 11
-        cdata.readInt64LE(0)
+        data.readInt64LE(0)
       when CONSTANTS.REG_LINK # 6
         throw new Error("Type #{type} is not supported.")
       when CONSTANTS.REG_RESOURCE_LIST # 8
