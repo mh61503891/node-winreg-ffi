@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mh61503891/winreg-ffi.git"
+    "url": "git+https://github.com/mh61503891/node-winreg-ffi.git"
   },
   "os": [
     "win32"
@@ -32,9 +32,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mh61503891/winreg-ffi/issues"
+    "url": "https://github.com/mh61503891/node-winreg-ffi/issues"
   },
-  "homepage": "https://github.com/mh61503891/winreg-ffi#readme",
+  "homepage": "https://github.com/mh61503891/node-winreg-ffi#readme",
   "dependencies": {
     "ffi": "^2.0.0",
     "jconv": "^0.1.5",
