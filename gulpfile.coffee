@@ -23,7 +23,7 @@ gulp.task 'lint-coffee', ->
 gulp.task 'test', ['test-mocha']
 
 gulp.task 'test-mocha', ->
-  gulp.src(['test/**/*'])
+  gulp.src(['test/**/*.coffee'])
     .pipe($.mocha())
 
 gulp.task 'watch', ->
