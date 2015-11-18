@@ -1,5 +1,3 @@
-**NOTE**: This module is currently under development, so probably it does not work well on your environments.
-
 # winreg-ffi
 
 A Node.js module for binding Winreg.h using [node-ffi](https://github.com/node-ffi/node-ffi).
