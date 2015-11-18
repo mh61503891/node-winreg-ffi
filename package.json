@@ -41,8 +41,7 @@
     "jconv": "^0.1.5",
     "meow": "^3.6.0",
     "ref": "^1.2.0",
-    "ref-struct": "^1.0.2",
-    "underscore": "^1.8.3"
+    "ref-struct": "^1.0.2"
   },
   "devDependencies": {
     "chai": "^3.4.1",
