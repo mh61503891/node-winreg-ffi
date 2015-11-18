@@ -7,6 +7,7 @@ A Node.js module for binding Winreg.h using [node-ffi](https://github.com/node-f
 ## Example
 
 ```example.coffee
+# written in CoffeeScript
 Registry = require('winreg-ffi')
 
 # keys
